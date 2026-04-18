@@ -176,7 +176,30 @@ h1, h2, h3, h4, .serif { font-family: var(--serif); }
 }
 
 /* Legacy support */
-.btn-secondary { @apply btn-outline-gold; }
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 3.5px;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--gold);
+  background: transparent;
+  border: 1px solid var(--gold-deep);
+  padding: 13px 34px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  -webkit-appearance: none;
+}
+.btn-secondary:hover {
+  background: var(--gold);
+  color: var(--noir);
+  border-color: var(--gold);
+}
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    INPUTS
@@ -822,7 +845,18 @@ input::placeholder, textarea::placeholder { color: var(--text-on-light-3); }
 }
 
 /* Legacy */
-.italian-card { @apply product-card; }
+.italian-card {
+  background: var(--white);
+  cursor: pointer;
+  position: relative;
+  transition: box-shadow 0.4s ease, transform 0.4s ease;
+  display: flex;
+  flex-direction: column;
+}
+.italian-card:hover {
+  box-shadow: 0 20px 64px rgba(8,8,16,0.14);
+  transform: translateY(-6px);
+}
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    BRANDS MARQUEE STRIP
@@ -1234,6 +1268,22 @@ input, select, textarea, button { -webkit-appearance: none; -moz-appearance: non
 @media (max-width: 600px) {
   .footer-bottom { padding: 18px 24px; flex-direction: column; text-align: center; }
 }
+
+.footer-email-input {
+  width: 240px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(196,154,80,0.2);
+  border-right: none;
+  color: #EAE2D6;
+  font-family: 'Jost', sans-serif;
+  font-size: 12px;
+  letter-spacing: 1px;
+  padding: 13px 18px;
+  outline: none;
+  transition: border-color 0.25s;
+}
+.footer-email-input::placeholder { color: rgba(234,226,214,0.35); }
+.footer-email-input:focus { border-color: rgba(196,154,80,0.5); }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    MISC

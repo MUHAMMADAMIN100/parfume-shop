@@ -124,7 +124,7 @@ export default function Navbar() {
                     placeholder="Поиск ароматов..."
                     value={searchParams.get("search") || ""}
                     onChange={e => updateFilter("search", e.target.value)}
-                    style={{ paddingLeft: "34px !important" as any }}
+                    style={{ paddingLeft: 34 }}
                   />
                 </div>
                 <select className="nav-filter"

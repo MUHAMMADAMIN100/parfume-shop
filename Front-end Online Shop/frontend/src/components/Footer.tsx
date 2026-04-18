@@ -27,17 +27,7 @@ export default function Footer() {
             <input
               type="email"
               placeholder="Ваш email адрес"
-              style={{
-                width: 240, background: "rgba(255,255,255,0.04) !important" as any,
-                border: "1px solid rgba(196,154,80,0.2) !important" as any,
-                borderRight: "none !important" as any,
-                color: "#EAE2D6 !important" as any,
-                fontFamily: "'Jost', sans-serif !important" as any,
-                fontSize: "12px !important" as any,
-                letterSpacing: "1px" as any,
-                padding: "13px 18px !important" as any,
-              }}
-              className="input-dark"
+              className="footer-email-input"
             />
             <button style={{
               padding: "13px 24px",
