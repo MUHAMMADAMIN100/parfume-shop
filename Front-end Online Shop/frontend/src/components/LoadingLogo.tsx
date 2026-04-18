@@ -5,39 +5,36 @@ interface Props {
 
 export default function LoadingLogo({ height = "50vh", size = 80 }: Props) {
   return (
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height }}>
+    <div style={{
+      display: "flex", justifyContent: "center", alignItems: "center",
+      height, background: "#080810",
+    }}>
       <div style={{ textAlign: "center" }}>
         <div
           className="loading-logo-ring"
           style={{
-            width: size,
-            height: size,
-            border: "1px solid #C9A96E",
-            borderRadius: "50%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            margin: "0 auto 16px",
-            backgroundColor: "#FFFFFF",
+            width: size, height: size,
+            border: "1px solid rgba(196,154,80,0.4)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            margin: "0 auto 18px",
+            background: "transparent",
             position: "relative",
           }}
         >
           <div style={{
             position: "absolute",
-            inset: 6,
-            border: "1px solid rgba(201,169,110,0.3)",
-            borderRadius: "50%",
+            inset: 8,
+            border: "1px solid rgba(196,154,80,0.15)",
           }} />
           <span style={{
-            fontFamily: "'Cormorant Garamond', 'Playfair Display', serif",
-            fontSize: Math.round(size * 0.26),
-            fontWeight: 400,
+            fontFamily: "'Cormorant Garamond', 'Georgia', serif",
+            fontSize: Math.round(size * 0.28),
+            fontWeight: 300,
             fontStyle: "italic",
-            color: "#C9A96E",
+            color: "#C49A50",
             letterSpacing: 2,
             userSelect: "none",
-            position: "relative",
-            zIndex: 1,
+            position: "relative", zIndex: 1,
           }}>
             El
           </span>
@@ -45,13 +42,11 @@ export default function LoadingLogo({ height = "50vh", size = 80 }: Props) {
         <p
           className="loading-logo-text"
           style={{
-            fontSize: 8,
-            letterSpacing: 6,
+            fontFamily: "'Cinzel', serif",
+            fontSize: 7.5, letterSpacing: 7,
             textTransform: "uppercase",
-            color: "#C9A96E",
-            fontFamily: "Montserrat",
-            fontWeight: 600,
-            margin: 0,
+            color: "rgba(196,154,80,0.6)",
+            fontWeight: 400, margin: 0,
           }}
         >
           ELIXIR
