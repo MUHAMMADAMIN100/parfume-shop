@@ -1,0 +1,88 @@
+import { useEffect } from "react";
+import { Routes, Route, useLocation } from "react-router-dom";
+import Home from "./pages/Home";
+import ProductPage from "./pages/ProductPage";
+import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import AdminDashboard from "./pages/Admin/AdminDashboard";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "./app/store";
+import { fetchCart, clearCart } from "./features/cart/cartSlice";
+import { syncFromStorage } from "./features/auth/authSlice";
+import OrdersHistory from "./pages/OrdersHistory";
+
+export default function App() {
+  const dispatch = useDispatch<AppDispatch>();
+  const token = useSelector((state: RootState) => state.auth.token);
+  const cartError = useSelector((state: RootState) => state.cart.error);
+  const location = useLocation();
+  const isAdmin = location.pathname.startsWith("/admin");
+
+  // Синхронизация авторизации
+  useEffect(() => {
+    console.log("App mounting, syncing from storage");
+    dispatch(syncFromStorage());
+  }, [dispatch]);
+
+  // Загрузка корзины при наличии токена
+  useEffect(() => {
+    if (!token) {
+      console.log("No token found, skipping cart load");
+      return;
+    }
+
+    console.log("Token found, loading cart after delay");
+    const timer = setTimeout(async () => {
+      try {
+        await dispatch(fetchCart()).unwrap();
+        console.log("Cart loaded successfully");
+      } catch (error: unknown) {
+        console.log("Failed to load cart:", error);
+
+        // Инициализация пустой корзины при ошибке
+        dispatch(clearCart());
+        console.log("Cart initialized as empty");
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [token, dispatch]);
+
+  // Логирование ошибок корзины
+  useEffect(() => {
+    if (cartError) {
+      console.log("Cart error occurred:", cartError);
+    }
+  }, [cartError]);
+
+  return (
+    <div style={{ backgroundColor: '#F7F4EF', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      {!isAdmin && <Navbar />}
+      <main style={{ flex: 1 }}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/product/:id" element={<ProductPage />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/orderHistory" element={<OrdersHistory />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route
+            path="/admin/*"
+            element={
+              <ProtectedRoute requiredRole="ADMIN">
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </main>
+      {!isAdmin && <Footer />}
+    </div>
+  );
+}

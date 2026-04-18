@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement()) @map("id")
+  email     String   @unique @map("email")
+  password  String   @map("password")
+  role      Role     @default(USER) @map("role")
+  createdAt DateTime @default(now()) @map("createdAt")
+  cart      Cart?
+  orders    Order[]
+
+  @@map("User")
+}
+
+model Product {
+  id          Int         @id @default(autoincrement()) @map("id")
+  name        String      @map("name")
+  description String?     @map("description")
+  price       Float       @map("price")
+  image       String?     @map("image")
+  category    String?     @map("category")
+  brand       String?     @map("brand")
+  sizes       Json?       @map("sizes")
+  stock       Int         @default(0) @map("stock")
+  createdAt   DateTime    @default(now()) @map("createdAt")
+  cartItems   CartItem[]
+  orderItems  OrderItem[]
+
+  @@map("Product")
+}
+
+model Cart {
+  id     Int        @id @default(autoincrement()) @map("id")
+  userId Int        @unique @map("userId")
+  user   User       @relation(fields: [userId], references: [id])
+  items  CartItem[]
+
+  @@map("Cart")
+}
+
+model CartItem {
+  id        Int     @id @default(autoincrement()) @map("id")
+  cartId    Int     @map("cartId")
+  productId Int     @map("productId")
+  quantity  Int     @default(1) @map("quantity")
+  size      String? @map("size")
+  color     String? @map("color")
+  cart      Cart    @relation(fields: [cartId], references: [id])
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("CartItem")
+}
+
+model Order {
+  id        Int         @id @default(autoincrement()) @map("id")
+  userId    Int         @map("userId")
+  createdAt DateTime    @default(now()) @map("createdAt")
+  user      User        @relation(fields: [userId], references: [id])
+  items     OrderItem[]
+
+  @@map("Order")
+}
+
+model OrderItem {
+  id        Int      @id @default(autoincrement()) @map("id")
+  orderId   Int      @map("orderId")
+  productId Int?
+  quantity  Int
+  price     Float
+  order     Order    @relation(fields: [orderId], references: [id])
+  product   Product? @relation(fields: [productId], references: [id])
+
+  @@map("OrderItem")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
