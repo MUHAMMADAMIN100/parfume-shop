@@ -9,42 +9,6 @@ export default function Footer() {
       {/* Top gold line */}
       <div style={{ height: 1, background: "linear-gradient(90deg, transparent, #C49A50 30%, #E8CE90 50%, #C49A50 70%, transparent)" }} />
 
-      {/* Newsletter */}
-      <div style={{
-        background: "linear-gradient(135deg, #0F0E1A 0%, #080810 60%)",
-        borderBottom: "1px solid rgba(196,154,80,0.1)",
-      }}>
-        <div style={{ maxWidth: 1320, margin: "0 auto", padding: "48px 64px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 32, flexWrap: "wrap" }}>
-          <div>
-            <p style={{ fontFamily: "'Cinzel', serif", fontSize: 8, letterSpacing: 5, color: "rgba(196,154,80,0.5)", marginBottom: 10, fontWeight: 400 }}>
-              ELIXIR NEWSLETTER
-            </p>
-            <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 26, color: "#EAE2D6", fontWeight: 300, letterSpacing: 2, lineHeight: 1.2 }}>
-              Первыми узнавайте о новинках
-            </p>
-          </div>
-          <div style={{ display: "flex", gap: 0, flexShrink: 0 }}>
-            <input
-              type="email"
-              placeholder="Ваш email адрес"
-              className="footer-email-input"
-            />
-            <button style={{
-              padding: "13px 24px",
-              background: "linear-gradient(135deg, #8A6A2C, #C49A50)",
-              border: "none", color: "#080810",
-              fontFamily: "'Jost'", fontSize: 9, letterSpacing: 3,
-              textTransform: "uppercase", fontWeight: 600, cursor: "pointer",
-              transition: "all 0.3s", whiteSpace: "nowrap",
-            }}
-              onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = "linear-gradient(135deg, #C49A50, #E8CE90)"}
-              onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = "linear-gradient(135deg, #8A6A2C, #C49A50)"}
-            >
-              Подписаться
-            </button>
-          </div>
-        </div>
-      </div>
 
       {/* Main grid */}
       <div className="footer-grid">
