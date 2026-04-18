@@ -341,7 +341,7 @@ function ProductCard({ product, idx }: { product: any; idx: number }) {
   return (
     <Link
       to={`/product/${product.id}`}
-      style={{ textDecoration: "none" }}
+      style={{ textDecoration: "none", display: "flex", flexDirection: "column", height: "100%" }}
     >
       <div
         className="product-card card-stagger"
