@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -rn '\"${import.meta.env.VITE_API_URL}' \"C:\\\\Users\\\\EXPERTCOMPUTER\\\\Desktop\\\\Sport Shop\\\\Front-end Online Shop\\\\frontend\\\\src\" --include=\"*.tsx\" --include=\"*.ts\" -l)",
+      "Bash(xargs sed:*)",
+      "Bash(python -c \"from PIL import Image; print\\('Pillow OK'\\)\")",
+      "Bash(py --version)",
+      "Bash(where python:*)",
+      "Bash(node -e \"require\\('fs'\\)\")",
+      "Bash(node -e \"require\\('sharp'\\)\")",
+      "Bash(npm install:*)",
+      "Bash(node -e ':*)",
+      "Bash(npm root:*)",
+      "Bash(grep -E \"\\\\.\\(ts|js\\)$\")",
+      "Bash(python3 -c ':*)",
+      "Bash(curl -s \"https://backendonline-shop-production-8bb2.up.railway.app/products\")",
+      "Bash(node -e \"const d=[];process.stdin.on\\('data',c=>d.push\\(c\\)\\);process.stdin.on\\('end',\\(\\)=>{const p=JSON.parse\\(d.join\\(''\\)\\);p.forEach\\(x=>console.log\\(x.id, x.name, x.category, x.price\\)\\)}\\)\")",
+      "Bash(curl -s \"https://backendonline-shop-production-8bb2.up.railway.app/products/22\")",
+      "Bash(curl -sI \"https://images.unsplash.com/photo-1491553895911-0055eca6402d?auto=format&fit=crop&w=800&q=80\")"
+    ]
+  }
+}
