@@ -20,9 +20,6 @@ interface Product {
   stock?: number;
 }
 
-const IMG_H = 520;
-
-
 export default function ProductPage() {
   const { id } = useParams<{ id: string }>();
   const [product, setProduct]         = useState<Product | null>(null);
@@ -58,11 +55,10 @@ export default function ProductPage() {
       .catch(console.error);
   }, [id]);
 
-  /** Плавная смена картинки */
   const switchImage = (url: string) => {
     if (url === activeImage) return;
     setImgFading(true);
-    setTimeout(() => { setActiveImage(url); setImgFading(false); }, 180);
+    setTimeout(() => { setActiveImage(url); setImgFading(false); }, 160);
   };
 
   const handleAdd = async () => {
@@ -76,8 +72,7 @@ export default function ProductPage() {
     }
 
     const alreadyInCart = cartItems.some(
-      item => item.productId === product!.id
-        && (item.size ?? null) === (selectedSize ?? null)
+      item => item.productId === product!.id && (item.size ?? null) === (selectedSize ?? null)
     );
     if (alreadyInCart) {
       notify.warning("Уже в корзине", "Этот аромат с выбранным объёмом уже в корзине");
@@ -108,177 +103,234 @@ export default function ProductPage() {
   const stockInfo = () => {
     if (!product) return null;
     const s = product.stock ?? 0;
-    if (s === 0)   return { label: "Нет в наличии",       color: "#FF0000" };
-    if (s <= 3)    return { label: `Осталось ${s} шт`,    color: "#CC8800" };
-    if (s <= 10)   return { label: `${s} шт в наличии`,   color: "#008000" };
-    return           { label: "В наличии",                color: "#008000" };
+    if (s === 0)  return { label: "Нет в наличии",     color: "#C0392B", dot: "#C0392B" };
+    if (s <= 3)   return { label: `Осталось ${s} шт`,  color: "#E8A020", dot: "#E8A020" };
+    if (s <= 10)  return { label: `${s} шт в наличии`, color: "#2D8A4E", dot: "#2D8A4E" };
+    return          { label: "В наличии",              color: "#2D8A4E", dot: "#2D8A4E" };
   };
 
-  if (!product) return (
-    <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", height: "60vh", gap: 16 }}>
-      <div className="loader-ring" />
-      <LoadingLogo height="60vh" />
-    </div>
-  );
+  if (!product) return <LoadingLogo height="80vh" />;
 
   const stock = stockInfo();
 
   return (
-    <div className="page-wrapper">
-      {/* ← Главное меню */}
-      <Link to="/" className="back-btn">
-        <i className="fas fa-arrow-left" style={{ fontSize: 12 }} />
-        Главное меню
-      </Link>
-      <div className="animate-slideInUp" style={{ maxWidth: 1100, margin: "0 auto", backgroundColor: "#FFFFFF", border: "1px solid #D9CFC0", display: "flex", flexWrap: "wrap" }}>
+    <div style={{ background: "#FAF7F2", minHeight: "100vh" }}>
 
-        {/* ═══ ЛЕВАЯ ЧАСТЬ: галерея ═══ */}
-        <div style={{ flex: "1 1 300px", minWidth: 0, display: "flex", flexDirection: "column" }}>
+      {/* Breadcrumb bar */}
+      <div style={{ borderBottom: "1px solid #E8DDD0", background: "#FFFFFF" }}>
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "14px 40px", display: "flex", alignItems: "center", gap: 10 }}>
+          <Link to="/" className="back-btn" style={{ marginBottom: 0, padding: "7px 16px", fontSize: 8 }}>
+            <i className="fas fa-arrow-left" />
+            Назад в каталог
+          </Link>
+          {product.category && (
+            <>
+              <span style={{ color: "#E8DDD0", fontSize: 11 }}>/</span>
+              <span style={{ fontSize: 8, letterSpacing: 2, textTransform: "uppercase", color: "#C9A96E", fontFamily: "Montserrat", fontWeight: 600 }}>
+                {product.category}
+              </span>
+            </>
+          )}
+          {product.brand && (
+            <>
+              <span style={{ color: "#E8DDD0", fontSize: 11 }}>/</span>
+              <span style={{ fontSize: 8, letterSpacing: 1.5, textTransform: "uppercase", color: "#8A7F75", fontFamily: "Montserrat" }}>
+                {product.brand}
+              </span>
+            </>
+          )}
+        </div>
+      </div>
 
-          <div style={{ display: "flex", flex: 1 }}>
-            {/* Тумбы (вертикальные, только на десктопе) */}
+      {/* Product layout */}
+      <div style={{ maxWidth: 1280, margin: "0 auto" }}>
+        <div className="product-page-grid" style={{ background: "#FFFFFF", borderBottom: "1px solid #E8DDD0" }}>
+
+          {/* ═══ LEFT: Gallery ═══ */}
+          <div style={{ position: "relative", borderRight: "1px solid #E8DDD0" }}>
+            <div style={{ display: "flex", height: "100%", minHeight: 520 }}>
+
+              {/* Vertical thumbs */}
+              {gallery.length > 1 && (
+                <div className="product-gallery-sidebar" style={{ flexDirection: "column", gap: 8, padding: "20px 0 20px 20px", flexShrink: 0 }}>
+                  {gallery.map((img, i) => (
+                    <button key={i} onClick={() => switchImage(img)} style={{
+                      width: 68, height: 68, padding: 0,
+                      border: activeImage === img ? "2px solid #1A0A2E" : "1px solid #E8DDD0",
+                      cursor: "pointer", background: "#FAF7F2", overflow: "hidden",
+                      transition: "all 0.22s", flexShrink: 0,
+                    }}>
+                      <img src={img} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Main image */}
+              <div
+                style={{ flex: 1, position: "relative", overflow: "hidden", cursor: "default", background: "#F5F0EB" }}
+                onTouchStart={e => setTouchStartX(e.touches[0].clientX)}
+                onTouchEnd={e => {
+                  if (touchStartX === null) return;
+                  const dx = e.changedTouches[0].clientX - touchStartX;
+                  if (Math.abs(dx) > 40) {
+                    const idx = gallery.indexOf(activeImage);
+                    if (dx < 0 && idx < gallery.length - 1) switchImage(gallery[idx + 1]);
+                    else if (dx > 0 && idx > 0) switchImage(gallery[idx - 1]);
+                  }
+                  setTouchStartX(null);
+                }}
+              >
+                {product.category && (
+                  <div style={{
+                    position: "absolute", top: 0, left: 0, zIndex: 2,
+                    background: "#1A0A2E", color: "#C9A96E",
+                    padding: "6px 16px", fontSize: 7.5, letterSpacing: 3.5,
+                    textTransform: "uppercase", fontFamily: "Montserrat", fontWeight: 600,
+                  }}>
+                    {product.category}
+                  </div>
+                )}
+                <img
+                  src={activeImage || "https://placehold.co/600x600/1A0A2E/C9A96E?text=ELIXIR"}
+                  alt={product.name}
+                  style={{
+                    position: "absolute", inset: 0, width: "100%", height: "100%",
+                    objectFit: "cover", display: "block",
+                    opacity: imgFading ? 0 : 1,
+                    transform: imgFading ? "scale(1.02)" : "scale(1)",
+                    transition: "opacity 0.16s ease, transform 0.16s ease",
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Mobile dots */}
             {gallery.length > 1 && (
-              <div className="product-gallery-sidebar" style={{ display: "flex", flexDirection: "column", gap: 8, padding: "16px 0 16px 16px", flexShrink: 0 }}>
+              <div className="mobile-gallery-dots">
                 {gallery.map((img, i) => (
                   <button key={i} onClick={() => switchImage(img)} style={{
-                    width: 72, height: 72, padding: 0,
-                    border: activeImage === img ? "2px solid #FF0000" : "1px solid #D9CFC0",
-                    cursor: "pointer", background: "#FAFAFA", overflow: "hidden",
-                    transform: activeImage === img ? "scale(1.05)" : "scale(1)",
-                    transition: "all 0.22s", flexShrink: 0
-                  }}>
-                    <img src={img} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                  </button>
+                    width: activeImage === img ? 18 : 7, height: 7, borderRadius: 4,
+                    backgroundColor: activeImage === img ? "#1A0A2E" : "#E8DDD0",
+                    border: "none", cursor: "pointer", padding: 0, transition: "all 0.2s",
+                  }} />
                 ))}
               </div>
             )}
+          </div>
 
-            {/* Главное фото + свайп на мобиле */}
-            <div
-              style={{ flex: 1, position: "relative", height: IMG_H, overflow: "hidden", cursor: gallery.length > 1 ? "grab" : "default" }}
-              onTouchStart={e => setTouchStartX(e.touches[0].clientX)}
-              onTouchEnd={e => {
-                if (touchStartX === null) return;
-                const dx = e.changedTouches[0].clientX - touchStartX;
-                if (Math.abs(dx) > 40) {
-                  const idx = gallery.indexOf(activeImage);
-                  if (dx < 0 && idx < gallery.length - 1) switchImage(gallery[idx + 1]);
-                  else if (dx > 0 && idx > 0) switchImage(gallery[idx - 1]);
-                }
-                setTouchStartX(null);
+          {/* ═══ RIGHT: Details ═══ */}
+          <div style={{ padding: "clamp(28px, 5vw, 56px)", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+
+            {/* Brand & category */}
+            <div className="animate-fadeInDelay1" style={{ marginBottom: 16 }}>
+              {product.brand && (
+                <p style={{ fontSize: 10, letterSpacing: 4, textTransform: "uppercase", color: "#C9A96E", fontFamily: "Montserrat", fontWeight: 700, marginBottom: 4 }}>
+                  {product.brand}
+                </p>
+              )}
+              {product.category && (
+                <p style={{ fontSize: 8, letterSpacing: 3, textTransform: "uppercase", color: "#8A7F75", fontFamily: "Montserrat", fontWeight: 500 }}>
+                  {product.category}
+                </p>
+              )}
+            </div>
+
+            {/* Name */}
+            <h1 className="serif animate-fadeInDelay1" style={{ fontSize: "clamp(24px, 3.5vw, 38px)", color: "#1A1A1A", fontWeight: 400, marginBottom: 20, lineHeight: 1.2, letterSpacing: 1 }}>
+              {product.name}
+            </h1>
+
+            {/* Gold divider */}
+            <div className="animate-fadeInDelay2" style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 22 }}>
+              <div style={{ flex: 1, height: 1, background: "linear-gradient(90deg, #C9A96E, transparent)" }} />
+              <div style={{ width: 5, height: 5, background: "#C9A96E", borderRadius: "50%" }} />
+            </div>
+
+            {/* Price */}
+            <p className="serif animate-fadeInDelay2" style={{ fontSize: "clamp(28px, 3vw, 40px)", color: "#1A0A2E", fontWeight: 400, marginBottom: 12, letterSpacing: 1 }}>
+              {product.price.toLocaleString()} <span style={{ fontSize: "0.55em", letterSpacing: 2, fontFamily: "Montserrat", fontWeight: 500, color: "#8A7F75" }}>сом.</span>
+            </p>
+
+            {/* Stock */}
+            {stock && (
+              <div className="animate-fadeInDelay2" style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 24 }}>
+                <div className="stock-pulse" style={{ width: 8, height: 8, borderRadius: "50%", backgroundColor: stock.dot, flexShrink: 0 }} />
+                <span style={{ fontSize: 9.5, fontFamily: "Montserrat", letterSpacing: 1.5, color: stock.color, fontWeight: 600, textTransform: "uppercase" }}>
+                  {stock.label}
+                </span>
+              </div>
+            )}
+
+            {/* Volume selector */}
+            {product.sizes && product.sizes.length > 0 && (
+              <div className="animate-fadeInDelay3" style={{ marginBottom: 24 }}>
+                <p style={{ fontSize: 8.5, letterSpacing: 3, textTransform: "uppercase", color: "#8A7F75", fontFamily: "Montserrat", fontWeight: 600, marginBottom: 12 }}>
+                  Объём: <span style={{ color: selectedSize ? "#1A0A2E" : "#C9A96E", letterSpacing: 1, fontWeight: 700 }}>{selectedSize || "не выбран"}</span>
+                </p>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  {product.sizes.map(s => (
+                    <button
+                      key={s}
+                      onClick={() => setSelectedSize(s)}
+                      style={{
+                        minWidth: 52, height: 42, padding: "0 12px",
+                        border: selectedSize === s ? "1.5px solid #1A0A2E" : "1px solid #E8DDD0",
+                        backgroundColor: selectedSize === s ? "#1A0A2E" : "transparent",
+                        color: selectedSize === s ? "#C9A96E" : "#4A4040",
+                        fontFamily: "Montserrat", fontSize: 11, fontWeight: 600,
+                        cursor: "pointer", transition: "all 0.22s",
+                        letterSpacing: 0.5,
+                      }}
+                      onMouseEnter={e => { if (selectedSize !== s) { (e.currentTarget as HTMLElement).style.borderColor = "#C9A96E"; (e.currentTarget as HTMLElement).style.color = "#C9A96E"; } }}
+                      onMouseLeave={e => { if (selectedSize !== s) { (e.currentTarget as HTMLElement).style.borderColor = "#E8DDD0"; (e.currentTarget as HTMLElement).style.color = "#4A4040"; } }}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Description */}
+            {product.description && (
+              <div className="animate-fadeInDelay3" style={{ marginBottom: 30 }}>
+                <div style={{ borderLeft: "2px solid #C9A96E", paddingLeft: 16 }}>
+                  <p style={{ fontSize: 11, color: "#6A6060", lineHeight: 1.9, fontFamily: "Montserrat", fontWeight: 300 }}>
+                    {product.description}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Add to cart button */}
+            <button
+              onClick={handleAdd}
+              disabled={addingToCart || product.stock === 0}
+              className={`btn-primary animate-fadeInDelay4${addingToCart ? " btn-loading" : ""}`}
+              style={{
+                width: "100%", textAlign: "center", fontSize: 9, letterSpacing: 3,
+                opacity: product.stock === 0 ? 0.45 : 1,
+                padding: "16px 32px",
               }}
             >
-              {product.category && (
-                <div style={{ position: "absolute", top: 16, left: 0, zIndex: 2, backgroundColor: "#1A0A2E", color: "#C9A96E", padding: "5px 16px", fontSize: 9, letterSpacing: 3, textTransform: "uppercase", fontFamily: "Montserrat", fontWeight: 600 }}>
-                  {product.category}
-                </div>
-              )}
-              <img
-                src={activeImage || "https://placehold.co/600x520/1A0A2E/C9A96E?text=ELIXIR"}
-                alt={product.name}
-                style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", display: "block", opacity: imgFading ? 0 : 1, transform: imgFading ? "scale(1.02)" : "scale(1)", transition: "opacity 0.18s ease, transform 0.18s ease" }}
-              />
-            </div>
-          </div>
+              {addingToCart ? "Добавляем..." : product.stock === 0 ? "Нет в наличии" : "Добавить в корзину"}
+            </button>
 
-          {/* Точки-навигатор (только мобиль) */}
-          {gallery.length > 1 && (
-            <div className="mobile-gallery-dots">
-              {gallery.map((img, i) => (
-                <button key={i} onClick={() => switchImage(img)} style={{ width: activeImage === img ? 20 : 8, height: 8, borderRadius: 4, backgroundColor: activeImage === img ? "#FF0000" : "#D9CFC0", border: "none", cursor: "pointer", padding: 0, transition: "all 0.2s" }} />
+            {/* Extra info */}
+            <div className="animate-fadeInDelay4" style={{ marginTop: 28, display: "flex", flexDirection: "column", gap: 10 }}>
+              {[
+                { icon: "fa-truck", text: "Бесплатная доставка от 5 000 сом." },
+                { icon: "fa-shield-alt", text: "Гарантия подлинности" },
+                { icon: "fa-undo", text: "Возврат в течение 14 дней" },
+              ].map(item => (
+                <div key={item.icon} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <i className={`fas ${item.icon}`} style={{ fontSize: 11, color: "#C9A96E", width: 14, flexShrink: 0 }} />
+                  <span style={{ fontSize: 10, color: "#8A7F75", fontFamily: "Montserrat", letterSpacing: 0.5 }}>{item.text}</span>
+                </div>
               ))}
             </div>
-          )}
-        </div>
-
-        {/* ═══ ПРАВАЯ ЧАСТЬ: детали ═══ */}
-        <div style={{ flex: "1 1 300px", minWidth: 0, padding: "clamp(20px, 4vw, 44px)", display: "flex", flexDirection: "column" }}>
-
-          {product.category && (
-            <p className="animate-fadeInDelay1" style={{ fontSize: 9, letterSpacing: 4, textTransform: "uppercase", color: "#C9A96E", fontFamily: "Montserrat", fontWeight: 600, marginBottom: 10 }}>
-              {product.category}
-            </p>
-          )}
-
-          {product.brand && (
-            <p className="animate-fadeInDelay1" style={{ fontSize: 11, letterSpacing: 3, textTransform: "uppercase", color: "#1A0A2E", fontFamily: "Montserrat", fontWeight: 700, marginBottom: 6 }}>
-              {product.brand}
-            </p>
-          )}
-
-          <h1 className="serif animate-fadeInDelay1" style={{ fontSize: 30, color: "#1A1A1A", fontWeight: 500, marginBottom: 16, lineHeight: 1.3 }}>
-            {product.name}
-          </h1>
-
-          <div className="animate-fadeInDelay2" style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-            <div style={{ width: 28, height: 1, backgroundColor: "#C9A96E" }} />
-            <div style={{ width: 5, height: 5, backgroundColor: "#1A0A2E", borderRadius: "50%" }} />
-            <div style={{ width: 28, height: 1, backgroundColor: "#C9A96E" }} />
           </div>
-
-          <p className="serif animate-fadeInDelay2" style={{ fontSize: 36, color: "#1A0A2E", fontWeight: 600, marginBottom: 14 }}>
-            {product.price.toLocaleString()} сом.
-          </p>
-
-          {/* Статус наличия */}
-          {stock && (
-            <div className="animate-fadeInDelay2" style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 24 }}>
-              <div className="stock-pulse" style={{ width: 9, height: 9, borderRadius: "50%", backgroundColor: stock.color }} />
-              <span style={{ fontSize: 11, fontFamily: "Montserrat", letterSpacing: 1, color: stock.color, fontWeight: 600 }}>
-                {stock.label}
-              </span>
-            </div>
-          )}
-
-          {/* ── Объём ── */}
-          {product.sizes && product.sizes.length > 0 && (
-            <div className="animate-fadeInDelay3" style={{ marginBottom: 22 }}>
-              <p style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "#777", fontFamily: "Montserrat", marginBottom: 10 }}>
-                Объём: <strong style={{ color: "#1A1A1A", letterSpacing: 0 }}>{selectedSize || "—"}</strong>
-              </p>
-              <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>
-                {product.sizes.map(s => (
-                  <button
-                    key={s}
-                    onClick={() => setSelectedSize(s)}
-                    style={{
-                      minWidth: 46, height: 44, padding: "0 10px",
-                      border: selectedSize === s ? "2px solid #1A1A1A" : "1px solid #D9CFC0",
-                      backgroundColor: selectedSize === s ? "#1A1A1A" : "#fff",
-                      color: selectedSize === s ? "#fff" : "#1A1A1A",
-                      fontFamily: "Montserrat", fontSize: 12, fontWeight: 600,
-                      cursor: "pointer", transition: "all 0.2s",
-                      transform: selectedSize === s ? "scale(1.08)" : "scale(1)"
-                    }}
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* ── Описание ── */}
-          {product.description && (
-            <p className="animate-fadeInDelay3" style={{
-              fontSize: 13, color: "#666", lineHeight: 1.85,
-              fontFamily: "Montserrat", marginBottom: 28,
-              borderLeft: "3px solid #F0ECE4", paddingLeft: 14
-            }}>
-              {product.description}
-            </p>
-          )}
-
-          {/* ── Кнопка ── */}
-          <button
-            onClick={handleAdd}
-            disabled={addingToCart || product.stock === 0}
-            className={`btn-primary animate-fadeInDelay4${addingToCart ? " btn-loading" : ""}`}
-            style={{ width: "100%", textAlign: "center", fontSize: 11, opacity: product.stock === 0 ? 0.5 : 1 }}
-          >
-            {addingToCart ? "Добавляем..." : product.stock === 0 ? "Нет в наличии" : "Добавить в корзину"}
-          </button>
-
         </div>
       </div>
     </div>
